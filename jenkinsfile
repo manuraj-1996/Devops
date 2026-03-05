@@ -1,0 +1,41 @@
+pipeline {
+    agent {
+        label 'worker-server'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/manuraj-1996/Devops.git',
+                        credentialsId: 'New'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                configFileProvider([configFile(fileId: 'jenkins-config-id', variable: 'MAVEN_SETTINGS')]) {
+                    sh 'mvn -s $MAVEN_SETTINGS clean deploy'
+                }
+            }
+        }
+    }
+}
+
