@@ -30,12 +30,13 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                configFileProvider([configFile(fileId: 'jenkins-config-id', variable: 'MAVEN_SETTINGS')]) {
-                    sh 'mvn -s $MAVEN_SETTINGS clean deploy'
-                }
-            }
+    steps {
+        // This wrapper provides the environment for configFile
+        configFileProvider([configFile(fileId: 'my-maven-settings', variable: 'MAVEN_SETTINGS')]) {
+            sh "mvn deploy -s $MAVEN_SETTINGS"
         }
+    }
+}
     }
 }
 
