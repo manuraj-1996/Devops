@@ -1,0 +1,58 @@
+pipeline {
+    agent { label 'Slave' }
+
+    environment {
+        IMAGE_NAME = 'my-app'
+        IMAGE_TAG = 'latest'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/manuraj-1996/Devops.git',
+                        credentialsId: 'New'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Build & Test (Maven in Docker)') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
+            steps {
+                sh 'mvn clean install'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+            }
+        }
+
+        stage('Deploy to Artifactory') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17'
+                }
+            }
+            steps {
+                configFileProvider([
+                    configFile(fileId: 'my_settings', variable: 'MAVEN_SETTINGS')
+                ]) {
+                    sh 'mvn deploy -s $MAVEN_SETTINGS'
+                }
+            }
+        }
+    }
+}
