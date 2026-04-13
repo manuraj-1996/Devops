@@ -1,9 +1,9 @@
 pipeline {
-    agent { label 'Slave' }
-
-    environment {
-        IMAGE_NAME = 'my-app'
-        IMAGE_TAG = 'latest'
+    agent {
+        docker {
+            image 'maven:3.8.6'
+            args '-v /root/.m2:/root/.m2'
+        }
     }
 
     stages {
