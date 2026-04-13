@@ -88,5 +88,14 @@
         </snapshotRepository>
 
     </distributionManagement>
+<repository>
+        <id>libs-release-local/</id>
+        <url>http://34.205.133.66:8081/artifactory/libs-release-local/</url>
+    </repository>
 
+    <snapshotRepository>
+        <id>libs-snapshot-local/</id>
+        <url>http://34.205.133.66:8081/artifactory/libs-snapshot-local/</url>
+    </snapshotRepository>
+</distributionManagement>
 </project>
