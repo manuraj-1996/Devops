@@ -1,24 +1,28 @@
 pipeline {
     agent { label 'slave' }
 
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    environment {
+        MAVEN_OPTS = '-Xmx1024m'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/manuraj-1996/Devops.git',
-                        credentialsId: 'New'
-                    ]]
-                ])
+                git branch: 'main',
+                    url: 'https://github.com/manuraj-1996/Devops.git',
+                    credentialsId: 'New'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
@@ -36,6 +40,15 @@ pipeline {
                     sh 'mvn deploy -s $MAVEN_SETTINGS'
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and Deployment Successful'
+        }
+        failure {
+            echo 'Build Failed'
         }
     }
 }
