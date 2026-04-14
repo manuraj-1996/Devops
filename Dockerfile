@@ -1,9 +1,11 @@
-FROM openjdk:17
+FROM tomcat:9-jdk17
 
-WORKDIR /app
+# Clean default apps
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY target/studentapp.jar app.jar
+# Copy WAR file
+COPY target/StudentManagementApp-1.4-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["catalina.sh", "run"]
