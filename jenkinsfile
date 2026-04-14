@@ -1,13 +1,5 @@
 pipeline {
     agent { label 'slave' }
-
-    tools {
-        jdk 'jdk17'
-        maven 'maven3'
-    }
-
-    environment {
-        MAVEN_OPTS = '-Xmx1024m'
     }
 
     stages {
@@ -16,13 +8,13 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/manuraj-1996/Devops.git',
-                    credentialsId: 'New'
+                    credentialsId: 'Githubtoken'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean install'
             }
         }
 
