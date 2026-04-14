@@ -77,8 +77,7 @@
     <!-- Artifactory deployment (UNCHANGED) -->
 
     <distributionManagement>
-<pluginRepositories>
-                <pluginRepository>
+
                     <id>libs-release-local</id>
                     <url>http://98.92.150.252:8081/artifactory/libs-release-local/</url>
                 </pluginRepository>
@@ -86,7 +85,6 @@
                 <pluginRepository>
                     <id>libs-snapshot-local</id>
                     <url>http://98.92.150.252:8081/artifactory/libs-snapshot-local/</url>
-                </pluginRepository>
-            </pluginRepositories>
+                
 </distributionManagement>
 </project>
