@@ -1,13 +1,13 @@
 pipeline {
+    agent any
+
     environment {
-        AWS_REGION = 'eu-north-1'
-        ACCOUNT_ID = '438987840260'
+        AWS_REGION = 'us-east-1'
+        ACCOUNT_ID = '772064137213'
         ECR_REPO = 'studentapp-repo'
-        ECR_URL = "438987840260.dkr.ecr.eu-north-1.amazonaws.com/studentapp-repo"
+        ECR_URL = "772064137213.dkr.ecr.us-east-1.amazonaws.com/studentapp-repo"
         IMAGE_NAME = 'studentapp:latest'
     }
-
-    agent any
 
     stages {
 
@@ -17,61 +17,73 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/shettar2025/studentapp.git',
-                        credentialsId: 'git-creds'
+                        url: 'https://github.com/manuraj-1996/Devops.git',
+                        credentialsId: 'Githubtoken'
                     ]]
                 ])
             }
         }
 
-        stage('Build') {
+        stage('Build & Test (Maven)') {
             steps {
-                sh 'mvn clean install'
-            }
-        }
-
-        stage('Test') {
-            steps {
+                sh 'mvn clean package'
                 sh 'mvn test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t studentapp:latest .'
+                sh """
+                    docker build -t ${IMAGE_NAME} .
+                """
             }
         }
 
-     stage('Login to ECR') {
-    steps {
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws-creds'
-        ]]) {
-            sh '''
-                aws sts get-caller-identity
+        stage('Login to ECR') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    sh """
+                        aws sts get-caller-identity
 
-                aws ecr get-login-password --region $AWS_REGION | \
-                docker login --username AWS \
-                --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-            '''
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS \
+                        --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                    """
+                }
+            }
         }
-    }
-}
+
         stage('Tag Docker Image') {
             steps {
-                sh '''
-                docker tag studentapp:latest $ECR_URL:latest
-               '''
+                sh """
+                    docker tag ${IMAGE_NAME} ${ECR_URL}:latest
+                """
             }
         }
 
         stage('Push to ECR') {
             steps {
-                sh '''
-                docker push $ECR_URL:latest
-              '''  
+                sh """
+                    docker push ${ECR_URL}:latest
+                """
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline executed successfully!'
+        }
+
+        failure {
+            echo '❌ Pipeline failed. Check logs for details.'
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
