@@ -77,14 +77,16 @@
     <!-- Artifactory deployment (UNCHANGED) -->
 
     <distributionManagement>
-<repository>
-        <id>libs-release-local/</id>
-        <url>http://34.205.133.66:8081/artifactory/libs-release-local/</url>
-    </repository>
+<pluginRepositories>
+                <pluginRepository>
+                    <id>libs-release-local</id>
+                    <url>http://98.92.150.252:8081/artifactory/libs-release-local/</url>
+                </pluginRepository>
 
-    <snapshotRepository>
-        <id>libs-snapshot-local/</id>
-        <url>http://34.205.133.66:8081/artifactory/libs-snapshot-local/</url>
-    </snapshotRepository>
+                <pluginRepository>
+                    <id>libs-snapshot-local</id>
+                    <url>http://98.92.150.252:8081/artifactory/libs-snapshot-local/</url>
+                </pluginRepository>
+            </pluginRepositories>
 </distributionManagement>
 </project>
